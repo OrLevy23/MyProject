@@ -54,7 +54,7 @@ public class MyAdapter extends RecyclerView.Adapter<MyAdapter.MyHolder> {
     }
     public void setStarred(int id) {
         Note temp = this.listData.get(id);
-        temp.setStar(!temp.isStarred());
+        temp.setStar();
         this.listData.set(id,temp);
         this.notifyDataSetChanged();
 

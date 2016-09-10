@@ -164,7 +164,7 @@ public class DBHandler {
             ContentValues args = new ContentValues();
             args.put(CONSTANTS.DB_SUBJECT, note.getSubject());
             args.put(CONSTANTS.DB_NOTE, note.getNote());
-            args.put(CONSTANTS.DB_STARRED, starToInt(note.isStarred()));
+            args.put(CONSTANTS.DB_STARRED, starToInt(!(note.isStarred())));
             db.update("Note", args, "_id" + "=" + id, null);
         } catch (SQLiteException e) {
             e.getMessage();

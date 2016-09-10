@@ -63,12 +63,12 @@ public class Note {
         return star;
     }
 
-    public void setStar(boolean star) {
-        this.star = star;
+    public void setStar() {
+        this.star = !star;
     }
 
     public boolean isClone(Note another) {
-        if (this.note == another.note && this.subject == another.subject && this.star == another.star) {
+        if (this.note.equals( another.note )&& this.subject.equals(another.subject )&& this.star == another.star) {
             return true;
         }
         return false;

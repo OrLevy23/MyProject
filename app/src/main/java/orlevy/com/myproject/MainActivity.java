@@ -158,7 +158,9 @@ public class MainActivity extends AppCompatActivity {
         adapter.notifyDataSetChanged();
     }
 
-
-
+    @Override
+    public void onBackPressed() {
+        finish();
+    }
 }
 //TODO: MOST IMPORTANT DESIGN THIS FUCKING SHIT!!!!

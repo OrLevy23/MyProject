@@ -19,13 +19,13 @@ public class AddNote extends AppCompatActivity {
     EditText subject;
     EditText note;
     private static ArrayList<String> list = new ArrayList<>();
-    private boolean isEdit = false;
+    private static boolean isEdit = false;
     private static MenuItem star;
     private static int idToEdit;
     private static Intent edit;
     private Note noteToEDIT;
     private DBHandler handler;
-    private  Boolean isStarred = false;
+    private static  Boolean isStarred = false;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -39,26 +39,64 @@ public class AddNote extends AppCompatActivity {
 
     @Override
     public void onBackPressed() {
-            if (!(subject.getText().toString().equals("") && note.getText().toString().equals(""))) {
+        if ((subject.getText().toString().equals("") && note.getText().toString().equals(""))) {
+            finish();
+        } else if(isEdit) {
+            Note clone = new Note(0, subject.getText().toString(), note.getText().toString(), isStarred);
+            if(noteToEDIT.isClone(clone)) {
+                isStarred = false;
+                finish();
+            } else {
                 final AlertDialog.Builder builder = new AlertDialog.Builder(AddNote.this);
-                builder.setTitle("Are you sure?");
-                builder.setMessage("Everything will be deleted");
-                builder.setPositiveButton("OK", new DialogInterface.OnClickListener() {
-
+                builder.setTitle("Save");
+                builder.setMessage("Would you like to save your changes?");
+                builder.setPositiveButton("Yes", new DialogInterface.OnClickListener() {
                     @Override
                     public void onClick(DialogInterface dialog, int which) {
+                        handler.editNote(idToEdit, subject.getText().toString(),note.getText().toString(),isStarred);
+                        Intent edit = new Intent(AddNote.this,MainActivity.class);
+                        startActivity(edit);
+
+
+                    }
+                });
+                builder.setNegativeButton("No", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        isStarred = false;
                         finish();
                     }
                 });
-                builder.setNegativeButton("Cancel", null);
                 builder.show();
-            } else {
-                finish();
             }
+        } else {
+            final AlertDialog.Builder builder = new AlertDialog.Builder(AddNote.this);
+            builder.setTitle("Save");
+            builder.setMessage("Would you like to save your note?");
+            builder.setPositiveButton("Save", new DialogInterface.OnClickListener() {
+                @Override
+                public void onClick(DialogInterface dialog, int which) {
+                    handler.addNote(subject.getText().toString(),note.getText().toString(),isStarred);
+                    Intent add = new Intent(AddNote.this,MainActivity.class);
+                    startActivity(add);
+
+                }
+            });
+            builder.setNegativeButton("Delete", new DialogInterface.OnClickListener() {
+                @Override
+                public void onClick(DialogInterface dialog, int which) {
+                    isStarred = false;
+                    finish();
+                }
+            });
+            builder.show();
 
         }
-//    Note clone = new Note(0,subject.getText().toString(),note.getText().toString(),isStarred);
-//    if(!isEdit && noteToEDIT.isClone(clone)) {
+
+    }
+
+
+
 
 
     @Override
@@ -69,6 +107,7 @@ public class AddNote extends AppCompatActivity {
             idToEdit = edit.getIntExtra("id", -1);
             DBHandler handler = new DBHandler(this);
             if(idToEdit != -1) {
+                isEdit = true;
                 noteToEDIT = handler.getItem(idToEdit);
                 subject.setText(noteToEDIT.getSubject());
                 note.setText(noteToEDIT.getNote());
@@ -78,7 +117,7 @@ public class AddNote extends AppCompatActivity {
                 } else {
                     star.setIcon(R.drawable.not_starred);
                 }
-                isEdit = true;
+
             }
 
         } catch (Exception e) {
@@ -148,6 +187,7 @@ public class AddNote extends AppCompatActivity {
 
             case R.id.action_remove: {
                 onBackPressed();
+
                 break;
             }
             case R.id.action_star : {

@@ -5,14 +5,13 @@ import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.design.widget.FloatingActionButton;
-import android.support.design.widget.Snackbar;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
-import android.view.View;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.view.View;
 
 import java.util.ArrayList;
 
@@ -26,6 +25,8 @@ public class MainActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+        Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
+        setSupportActionBar(toolbar);
         FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.fab_add);
         // DB
         handler = new DBHandler(MainActivity.this);
@@ -78,19 +79,39 @@ public class MainActivity extends AppCompatActivity {
 
             //Delete
             @Override
-            public void onSecondaryIconClick(int p) {
-                int id = list.get(p).getId();
-                handler.deleteRecord(id);
-                adapter.clearItem(p);
+            public void onSecondaryIconClick(final int p) {
+                final AlertDialog.Builder builder = new AlertDialog.Builder(MainActivity.this);
+                builder.setTitle("Are you sure?");
+                builder.setMessage("Item will be deleted");
+                builder.setPositiveButton("OK", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        int id = list.get(p).getId();
+                        handler.deleteRecord(id);
+                        adapter.clearItem(p);
+                    }
+                });
+                builder.setNegativeButton("Cancel", null);
+                builder.show();
             }
+
+            @Override
+            public void onStarredIconClick(int p) {
+                Note noteToStar = list.get(p);
+                int id = noteToStar.getId();
+                handler.star(id,noteToStar);
+                adapter.setStarred(p);
+            }
+
         });
+
     }
 
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         // Inflate the menu; this adds items to the action bar if it is present.
-        getMenuInflater().inflate(R.menu.menu_main, menu);
+        getMenuInflater().inflate(R.menu.menu_notes, menu);
         return true;
     }
 
@@ -101,10 +122,33 @@ public class MainActivity extends AppCompatActivity {
         // as you specify a parent activity in AndroidManifest.xml.
         int id = item.getItemId();
         //noinspection SimplifiableIfStatement
-        if (id == R.id.action_settings) {
-            return true;
+        if (id == R.id.action_delete_all) {
+            final AlertDialog.Builder builder = new AlertDialog.Builder(MainActivity.this);
+            builder.setTitle("Are you sure?");
+            builder.setMessage("Everything will be deleted");
+            builder.setPositiveButton("OK", new DialogInterface.OnClickListener() {
+                @Override
+                public void onClick(DialogInterface dialog, int which) {
+                    handler.removeAll();
+                    list.clear();
+                    list = handler.getAllNotes();
+                    adapter.clearData();
+                    adapter.notifyDataSetChanged();
+                }
+            });
+
+            builder.setNegativeButton("Cancel", null);
+            builder.show();
+        } else if(id == R.id.action_add_note) {
+            Intent a = new Intent(MainActivity.this, AddNote.class);
+            startActivity(a);
+        } else if(id == R.id.action_starred){
+            list = handler.getStarred();
+            adapter.notifyDataSetChanged();
         }
-        return super.onOptionsItemSelected(item);
+
+
+        return true;
     }
 
 
@@ -113,5 +157,8 @@ public class MainActivity extends AppCompatActivity {
         super.onResume();
         adapter.notifyDataSetChanged();
     }
+
+
+
 }
 //TODO: MOST IMPORTANT DESIGN THIS FUCKING SHIT!!!!

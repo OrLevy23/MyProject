@@ -11,6 +11,7 @@ import java.util.Date;
 public class Note {
     private String subject;
     private String note;
+    private boolean star=false;
     private Color color;
     private Date date;
     private int id;
@@ -51,9 +52,25 @@ public class Note {
         this.date = date;
     }
 
-    public Note(int id,String subject, String note) {
+    public Note(int id,String subject, String note,boolean star) {
         this.subject = subject;
         this.note = note;
         this.id = id;
+        this.star = star;
+    }
+
+    public boolean isStarred() {
+        return star;
+    }
+
+    public void setStar(boolean star) {
+        this.star = star;
+    }
+
+    public boolean isClone(Note another) {
+        if (this.note == another.note && this.subject == another.subject && this.star == another.star) {
+            return true;
+        }
+        return false;
     }
 }

@@ -14,16 +14,17 @@ public class DBHandler {
     private static String tableName = "Note";
 
     public DBHandler(Context context) {
-        helper = new DBHelper(context, "Note.db", null, 1);
+        helper = new DBHelper(context, "Note.db", null, 2);
     }
 
-    public void addNote(String subject, String note) {
+    public void addNote(String subject, String note,boolean starred) {
         SQLiteDatabase db = helper.getWritableDatabase();
         try {
             //  db.execSQL("Insert into book values('pinokio','jepeto','100')"); NOT recommended
             ContentValues values = new ContentValues();
             values.put(CONSTANTS.DB_SUBJECT, subject);
             values.put(CONSTANTS.DB_NOTE, note);
+            values.put(CONSTANTS.DB_STARRED,starToInt(starred));
             db.insert(CONSTANTS.DB_TABLE_NAME, null, values);
         } catch (SQLiteException e) {
             e.getMessage();
@@ -53,6 +54,7 @@ public class DBHandler {
     }
 
     public Note getItem(int id) {
+        Boolean isStarred = false;
         SQLiteDatabase db = helper.getReadableDatabase();
         Cursor cursor = null;
         Note temp = null;
@@ -62,7 +64,8 @@ public class DBHandler {
                 int getID = cursor.getInt(0);
                 String subject = cursor.getString(1);
                 String note = cursor.getString(2);
-                temp = new Note(getID,subject,note);
+                isStarred = isStarred(cursor.getInt(3));
+                temp = new Note(getID,subject,note,isStarred);
             }
         } catch (SQLiteException e) {
             e.getMessage();
@@ -76,13 +79,15 @@ public class DBHandler {
         ArrayList<Note> list = new ArrayList<>();
         SQLiteDatabase db = helper.getReadableDatabase();
         Cursor cursor = null;
+        Boolean isStarred = false;
         try {
             cursor = db.query(CONSTANTS.DB_TABLE_NAME, null, null, null, null, null, null, null);
             while (cursor.moveToNext()) {
                 int id = cursor.getInt(0);
                 String subject = cursor.getString(1);
                 String note = cursor.getString(2);
-                list.add(new Note(id,subject, note));
+                isStarred = isStarred(cursor.getInt(3));
+                list.add(new Note(id,subject, note,isStarred));
             }
         } catch (SQLiteException e) {
             e.getMessage();
@@ -91,13 +96,14 @@ public class DBHandler {
 
     }
 
-    public void editNote(int idToEdit, String strSubject, String strNote) {
+    public void editNote(int idToEdit, String strSubject, String strNote, boolean isStarred) {
         SQLiteDatabase db = helper.getWritableDatabase();
         try {
             ContentValues args = new ContentValues();
             args.put(CONSTANTS.DB_SUBJECT, strSubject);
             args.put(CONSTANTS.DB_NOTE, strNote);
-            int i = db.update("Note", args, "_id" + "=" + idToEdit, null);
+            args.put(CONSTANTS.DB_STARRED, starToInt(isStarred));
+            db.update("Note", args, "_id" + "=" + idToEdit, null);
         } catch (SQLiteException e) {
             e.getMessage();
         } finally {
@@ -119,8 +125,55 @@ public class DBHandler {
         }
     }
 
+    public ArrayList<Note> getStarred() {
+        SQLiteDatabase db = helper.getReadableDatabase();
+        ArrayList<Note> list = new ArrayList<>();
+        Cursor cursor =  db.query(CONSTANTS.DB_TABLE_NAME,null,CONSTANTS.DB_STARRED + "=?",new String[]{"1"},null,null,null);
+        try {
+            while (cursor.moveToNext()) {
+                int id = cursor.getInt(0);
+                String subject = cursor.getString(1);
+                String note = cursor.getString(2);
+                Boolean isStarred = isStarred(cursor.getInt(3));
+                list.add(new Note(id, subject, note, isStarred));
+            }
+        } catch (SQLiteException e) {
+            e.getMessage();
+        }
+        return list;
+    }
+
+    public boolean isStarred(int i) {
+        if (i==1) {
+            return true;
+        } else {
+            return false;
+        }
+    }
+    public int starToInt(Boolean a) {
+        if (a) {
+            return 1;
+        } else {
+            return 0;
+        }
+    }
+
+    public void star(int id,Note note) {
+        SQLiteDatabase db = helper.getWritableDatabase();
+        try {
+            ContentValues args = new ContentValues();
+            args.put(CONSTANTS.DB_SUBJECT, note.getSubject());
+            args.put(CONSTANTS.DB_NOTE, note.getNote());
+            args.put(CONSTANTS.DB_STARRED, starToInt(note.isStarred()));
+            db.update("Note", args, "_id" + "=" + id, null);
+        } catch (SQLiteException e) {
+            e.getMessage();
+        } finally {
+            if(db.isOpen()){
+                db.close();
+            }
+        }
+    }
 }
-
-
 
 

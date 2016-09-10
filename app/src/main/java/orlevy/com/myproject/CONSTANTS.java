@@ -10,6 +10,7 @@ public class CONSTANTS {
     public static final String DB_ID = "_id";
     public static final String DB_SUBJECT = "subject";
     public static final String DB_NOTE = "note";
+    public static final String DB_STARRED = "starred";
     public static final int DB_VERSION = 1;
 
 }

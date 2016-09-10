@@ -1,4 +1,10 @@
 <resources>
     <string name="app_name">MyProject</string>
-    <string name="action_settings">Settings</string>
+    <string name="Add_Note">Add Note</string>
+    <string name="Discard">Discard</string>
+    <string name="Delete_all">Delete all</string>
+    <string name="title_activity_add_note_v2">AddNoteV2</string>
+    <string name="favorites">Favorits</string>
+    <string name="starred">Starred notes</string>
+
 </resources>

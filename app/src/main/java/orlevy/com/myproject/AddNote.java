@@ -25,7 +25,7 @@ public class AddNote extends AppCompatActivity {
     private static Intent edit;
     private Note noteToEDIT;
     private DBHandler handler;
-    private static  Boolean isStarred = false;
+    private Boolean isStarred = false;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -44,7 +44,6 @@ public class AddNote extends AppCompatActivity {
         } else if(isEdit) {
             Note clone = new Note(0, subject.getText().toString(), note.getText().toString(), isStarred);
             if(noteToEDIT.isClone(clone)) {
-                isStarred = false;
                 finish();
             } else {
                 final AlertDialog.Builder builder = new AlertDialog.Builder(AddNote.this);
@@ -63,7 +62,6 @@ public class AddNote extends AppCompatActivity {
                 builder.setNegativeButton("No", new DialogInterface.OnClickListener() {
                     @Override
                     public void onClick(DialogInterface dialog, int which) {
-                        isStarred = false;
                         finish();
                     }
                 });
@@ -85,7 +83,6 @@ public class AddNote extends AppCompatActivity {
             builder.setNegativeButton("Delete", new DialogInterface.OnClickListener() {
                 @Override
                 public void onClick(DialogInterface dialog, int which) {
-                    isStarred = false;
                     finish();
                 }
             });

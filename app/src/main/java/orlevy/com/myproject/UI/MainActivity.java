@@ -1,34 +1,39 @@
-package orlevy.com.myproject;
+package orlevy.com.myproject.UI;
 
 import android.app.AlertDialog;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
-import android.support.design.widget.FloatingActionButton;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
 import android.view.Menu;
 import android.view.MenuItem;
-import android.view.View;
+import android.widget.Toast;
 
 import java.util.ArrayList;
+
+import orlevy.com.myproject.Class.Note;
+import orlevy.com.myproject.DB.DBHandler;
+import orlevy.com.myproject.R;
 
 public class MainActivity extends AppCompatActivity {
     private static ArrayList<Note> list = new ArrayList<>();
     private RecyclerView recyclerView;
     private MyAdapter adapter;
     private DBHandler handler;
-
+    private boolean isStarredList = false;
+    private boolean isArchivedList = false;
+    private MenuItem starred;
+    private MenuItem archived;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
-        FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.fab_add);
-        // DB
+         // DB
         handler = new DBHandler(MainActivity.this);
         list = handler.getAllNotes();
         // RecView
@@ -36,38 +41,6 @@ public class MainActivity extends AppCompatActivity {
         recyclerView = (RecyclerView) findViewById(R.id.my_recycler_view);
         recyclerView.setLayoutManager(new LinearLayoutManager(this));
         recyclerView.setAdapter(adapter);
-        FloatingActionButton fab1 = (FloatingActionButton) findViewById(R.id.fab_delete);
-        fab1.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                final AlertDialog.Builder builder = new AlertDialog.Builder(MainActivity.this);
-                builder.setTitle("Are you sure?");
-                builder.setMessage("Everything will be deleted");
-                builder.setPositiveButton("OK", new DialogInterface.OnClickListener() {
-                    @Override
-                    public void onClick(DialogInterface dialog, int which) {
-                        handler.removeAll();
-                        list.clear();
-                        list = handler.getAllNotes();
-                        adapter.clearData();
-                        adapter.notifyDataSetChanged();
-                    }
-                });
-
-                builder.setNegativeButton("Cancel", null);
-                builder.show();
-            }
-        });
-
-
-        // Floating button
-        fab.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                Intent a = new Intent(MainActivity.this, AddNote.class);
-                startActivity(a);
-            }
-        });
         // Edit
         adapter.setItemClickCallback(new MyAdapter.ItemClickCallback() {
             @Override
@@ -80,19 +53,10 @@ public class MainActivity extends AppCompatActivity {
             //Delete
             @Override
             public void onSecondaryIconClick(final int p) {
-                final AlertDialog.Builder builder = new AlertDialog.Builder(MainActivity.this);
-                builder.setTitle("Are you sure?");
-                builder.setMessage("Item will be deleted");
-                builder.setPositiveButton("OK", new DialogInterface.OnClickListener() {
-                    @Override
-                    public void onClick(DialogInterface dialog, int which) {
-                        int id = list.get(p).getId();
-                        handler.deleteRecord(id);
-                        adapter.clearItem(p);
-                    }
-                });
-                builder.setNegativeButton("Cancel", null);
-                builder.show();
+                Note note = list.get(p);
+                handler.archiveRecord(note);
+                adapter.archiveItem(p);
+                Toast.makeText(MainActivity.this, "item was archived", Toast.LENGTH_SHORT).show();
             }
 
             @Override
@@ -112,8 +76,11 @@ public class MainActivity extends AppCompatActivity {
     public boolean onCreateOptionsMenu(Menu menu) {
         // Inflate the menu; this adds items to the action bar if it is present.
         getMenuInflater().inflate(R.menu.menu_notes, menu);
+        starred= menu.findItem(R.id.action_starred);
+        archived = menu.findItem(R.id.action_archived);
         return true;
     }
+
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
@@ -122,7 +89,7 @@ public class MainActivity extends AppCompatActivity {
         // as you specify a parent activity in AndroidManifest.xml.
         int id = item.getItemId();
         //noinspection SimplifiableIfStatement
-        if (id == R.id.action_delete_all) {
+        if (id == R.id.action_archive_all) {
             final AlertDialog.Builder builder = new AlertDialog.Builder(MainActivity.this);
             builder.setTitle("Are you sure?");
             builder.setMessage("Everything will be deleted");
@@ -136,17 +103,18 @@ public class MainActivity extends AppCompatActivity {
                     adapter.notifyDataSetChanged();
                 }
             });
-
             builder.setNegativeButton("Cancel", null);
             builder.show();
         } else if(id == R.id.action_add_note) {
-            Intent a = new Intent(MainActivity.this, AddNote.class);
-            startActivity(a);
+            Intent add = new Intent(MainActivity.this, AddNote.class);
+            startActivity(add);
         } else if(id == R.id.action_starred){
-            list = handler.getStarred();
-            adapter.notifyDataSetChanged();
+                Intent starred = new Intent(MainActivity.this,Starred.class);
+                startActivity(starred);
+        } else if(id == R.id.action_archived) {
+            Intent archived = new Intent(MainActivity.this,Archived.class);
+            startActivity(archived);
         }
-
 
         return true;
     }
@@ -158,9 +126,6 @@ public class MainActivity extends AppCompatActivity {
         adapter.notifyDataSetChanged();
     }
 
-    @Override
-    public void onBackPressed() {
-        finish();
-    }
+
 }
 //TODO: MOST IMPORTANT DESIGN THIS FUCKING SHIT!!!!

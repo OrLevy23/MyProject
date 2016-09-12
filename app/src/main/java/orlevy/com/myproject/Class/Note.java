@@ -1,4 +1,4 @@
-package orlevy.com.myproject;
+package orlevy.com.myproject.Class;
 
 import android.graphics.Color;
 
@@ -15,6 +15,7 @@ public class Note {
     private Color color;
     private Date date;
     private int id;
+    private boolean archived = false;
 
     public String getSubject() {
         return subject;
@@ -52,11 +53,12 @@ public class Note {
         this.date = date;
     }
 
-    public Note(int id,String subject, String note,boolean star) {
+    public Note(int id,String subject, String note,boolean star, boolean archived) {
         this.subject = subject;
         this.note = note;
         this.id = id;
         this.star = star;
+        this.archived = archived;
     }
 
     public boolean isStarred() {
@@ -72,5 +74,13 @@ public class Note {
             return true;
         }
         return false;
+    }
+
+    public boolean isArchived() {
+        return archived;
+    }
+
+    public void setArchived() {
+        this.archived = true;
     }
 }

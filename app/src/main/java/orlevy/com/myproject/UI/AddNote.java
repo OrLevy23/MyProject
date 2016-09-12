@@ -1,4 +1,4 @@
-package orlevy.com.myproject;
+package orlevy.com.myproject.UI;
 
 import android.app.AlertDialog;
 import android.content.DialogInterface;
@@ -15,13 +15,18 @@ import android.widget.EditText;
 
 import java.util.ArrayList;
 
+import orlevy.com.myproject.DB.DBHandler;
+import orlevy.com.myproject.Class.Note;
+import orlevy.com.myproject.R;
+
 public class AddNote extends AppCompatActivity {
     EditText subject;
     EditText note;
     private static ArrayList<String> list = new ArrayList<>();
-    private static boolean isEdit = false;
+    private boolean isEdit = false;
     private static MenuItem star;
     private static int idToEdit;
+    private boolean isArchived = false;
     private static Intent edit;
     private Note noteToEDIT;
     private DBHandler handler;
@@ -42,7 +47,7 @@ public class AddNote extends AppCompatActivity {
         if ((subject.getText().toString().equals("") && note.getText().toString().equals(""))) {
             finish();
         } else if(isEdit) {
-            Note clone = new Note(0, subject.getText().toString(), note.getText().toString(), isStarred);
+            Note clone = new Note(0, subject.getText().toString(), note.getText().toString(), isStarred,false);
             if(noteToEDIT.isClone(clone)) {
                 finish();
             } else {
@@ -52,10 +57,14 @@ public class AddNote extends AppCompatActivity {
                 builder.setPositiveButton("Yes", new DialogInterface.OnClickListener() {
                     @Override
                     public void onClick(DialogInterface dialog, int which) {
-                        handler.editNote(idToEdit, subject.getText().toString(),note.getText().toString(),isStarred);
-                        Intent edit = new Intent(AddNote.this,MainActivity.class);
-                        startActivity(edit);
-
+                        handler.editNote(idToEdit, subject.getText().toString(),note.getText().toString(),isStarred,isArchived);
+                        if(!isArchived) {
+                            Intent edit = new Intent(AddNote.this, MainActivity.class);
+                            startActivity(edit);
+                        } else {
+                            Intent editArchived = new Intent(AddNote.this, Archived.class);
+                            startActivity(editArchived);
+                        }
 
                     }
                 });
@@ -74,9 +83,9 @@ public class AddNote extends AppCompatActivity {
             builder.setPositiveButton("Save", new DialogInterface.OnClickListener() {
                 @Override
                 public void onClick(DialogInterface dialog, int which) {
-                    handler.addNote(subject.getText().toString(),note.getText().toString(),isStarred);
-                    Intent add = new Intent(AddNote.this,MainActivity.class);
-                    startActivity(add);
+                    handler.addNote(subject.getText().toString(),note.getText().toString(),isStarred,false);
+                        Intent add = new Intent(AddNote.this, MainActivity.class);
+                        startActivity(add);
 
                 }
             });
@@ -102,6 +111,7 @@ public class AddNote extends AppCompatActivity {
         edit = getIntent();
         try {
             idToEdit = edit.getIntExtra("id", -1);
+            isArchived = edit.getBooleanExtra("archived", false);
             DBHandler handler = new DBHandler(this);
             if(idToEdit != -1) {
                 isEdit = true;
@@ -145,9 +155,9 @@ public class AddNote extends AppCompatActivity {
                 if (!strSubject.equals("")) {
                     if (!strNote.equals("")) {
                         if (!isEdit) {
-                            handler.addNote(strSubject, strNote,isStarred);
+                            handler.addNote(strSubject, strNote,isStarred,false);
                         } else {
-                            handler.editNote(idToEdit,strSubject,strNote,isStarred);
+                            handler.editNote(idToEdit,strSubject,strNote,isStarred,isArchived);
                             isEdit = false;
                         }
                         Intent a = new Intent(AddNote.this, MainActivity.class);
@@ -160,14 +170,19 @@ public class AddNote extends AppCompatActivity {
                             @Override
                             public void onClick(DialogInterface dialog, int which) {
                                 if(!isEdit) {
-                                    handler.addNote(strSubject, strNote,isStarred);
+                                    handler.addNote(strSubject, strNote,isStarred,false);
 
                                 } else {
-                                    handler.editNote(idToEdit,strSubject,strNote,isStarred);
+                                    handler.editNote(idToEdit,strSubject,strNote,isStarred,isArchived);
                                     isEdit = false;
                                 }
-                                Intent a = new Intent(AddNote.this, MainActivity.class);
-                                startActivity(a);
+                                if(!isArchived) {
+                                    Intent a = new Intent(AddNote.this, MainActivity.class);
+                                    startActivity(a);
+                                } else {
+                                    Intent editArchive = new Intent(AddNote.this,Archived.class);
+                                    startActivity(editArchive);
+                                }
                             }
                         });
                         builder.setNegativeButton("Cancel", null);

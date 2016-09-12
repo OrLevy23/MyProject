@@ -1,4 +1,4 @@
-package orlevy.com.myproject;
+package orlevy.com.myproject.DB;
 
 /**
  * Created by Or.levy on 07/09/2016.
@@ -19,7 +19,7 @@ public class DBHelper extends SQLiteOpenHelper {
     @Override
     public void onCreate(SQLiteDatabase sqLiteDatabase) {
 //        String cmd ="CREATE TABLE " + CONSTANTS.DB_TABLE_NAME + "(" + CONSTANTS.DB_ID + "INTEGER PRIMARY KEY," + CONSTANTS.DB_SUBJECT + "TEXT" + CONSTANTS.DB_NOTE + "TEXT)";
-        String cmd ="CREATE TABLE Note (_id INTEGER PRIMARY KEY, subject TEXT, note TEXT,starred INTEGER)";
+        String cmd ="CREATE TABLE Note (_id INTEGER PRIMARY KEY, subject TEXT, note TEXT,starred INTEGER,archived INTEGER)";
         try {
             sqLiteDatabase.execSQL(cmd);
         } catch (SQLiteException e) {

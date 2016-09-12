@@ -16,7 +16,7 @@
         app:showAsAction="always"/>
     <item
         android:id="@+id/action_add"
-        android:icon="@android:drawable/ic_input_add"
+        android:icon="@drawable/ic_done_black_36dp"
         android:title="@string/Add_Note"
         app:showAsAction="always"/>
 

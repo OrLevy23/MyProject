@@ -1,4 +1,4 @@
-package orlevy.com.myproject;
+package orlevy.com.myproject.UI;
 
 import android.content.Context;
 import android.support.v7.widget.RecyclerView;
@@ -8,22 +8,32 @@ import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.TextView;
 
-import java.util.List;
+import java.util.ArrayList;
+
+import orlevy.com.myproject.Class.Note;
+import orlevy.com.myproject.R;
 
 /**
  * Created by Or.levy on 05/09/2016.
  */
 public class MyAdapter extends RecyclerView.Adapter<MyAdapter.MyHolder> {
-    private List<Note> listData;
+    private ArrayList<Note> listData;
     private LayoutInflater inflater;
     private ItemClickCallback itemClickCallback;
     private static ImageView starred;
+    private static ArrayList<Note> archived = new ArrayList<>();
+    private static ArrayList<Note> backup = new ArrayList<>();
 
 
-    public MyAdapter(List<Note> listData, Context c) {
+    public MyAdapter(ArrayList<Note> listData, Context c) {
         this.inflater = LayoutInflater.from(c);
         this.listData = listData;
 
+    }
+
+    public void setAll(ArrayList<Note> all) {
+        listData = all;
+        this.notifyDataSetChanged();
     }
 
     public interface ItemClickCallback {
@@ -48,7 +58,9 @@ public class MyAdapter extends RecyclerView.Adapter<MyAdapter.MyHolder> {
         }
     }
 
-    public void clearItem(int id) {
+    public void archiveItem(int id) {
+        this.listData.get(id).setArchived();
+        archived.add(this.listData.get(id));
         this.listData.remove(id);
         this.notifyDataSetChanged();
     }
@@ -114,6 +126,24 @@ public class MyAdapter extends RecyclerView.Adapter<MyAdapter.MyHolder> {
                 itemClickCallback.onSecondaryIconClick(getAdapterPosition());
             }
         }
+    }
+    public void getStarred() {
+        for(Note note: this.listData) {
+            if(!note.isStarred()) {
+                listData.remove(note);
+            }
+        }
+        this.notifyDataSetChanged();
+
+    }
+    public void archived() {
+        backup = this.listData;
+        this.listData = archived;
+        this.notifyDataSetChanged();
+    }
+    public void getAll(){
+        this.listData = backup;
+        this.notifyDataSetChanged();
     }
 
 

@@ -13,10 +13,9 @@
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
         <activity
-            android:name=".MainActivity"
+            android:name=".UI.MainActivity"
             android:label="@string/app_name"
-            android:theme="@style/AppTheme.NoActionBar"
-            >
+            android:theme="@style/AppTheme.NoActionBar">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 
@@ -24,10 +23,13 @@
             </intent-filter>
         </activity>
         <activity
-            android:name=".AddNote"
+            android:name=".UI.AddNote"
             android:label="AddNot"
-            android:theme="@style/AppTheme.NoActionBar"
-            />
+            android:theme="@style/AppTheme.NoActionBar" />
+        <activity android:name=".UI.Archived" />
+        <activity
+            android:name=".UI.Starred"
+            android:theme="@style/AppTheme.NoActionBar" />
     </application>
 
 </manifest>

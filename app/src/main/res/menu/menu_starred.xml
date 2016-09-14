@@ -1,25 +1,23 @@
-<menu
-    xmlns:android="http://schemas.android.com/apk/res/android"
+<menu xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
-    tools:context=".UI.Starred">
+    tools:context="orlevy.com.myproject.AddNoteV2">
+    <item android:title="@string/Archive_all"
+        android:id="@+id/action_archive_all_starred"/>
     <item
-        android:id="@+id/action_settings"
+        android:id="@+id/action_archived_from_starred"
         android:orderInCategory="100"
-        android:title="@string/Add_Note"
+        android:title="@string/archived"
         app:showAsAction="never" />
     <item
-        android:id="@+id/action_search"
-        android:orderInCategory="200"
-        android:title="Search"
-        android:icon="@drawable/ic_back"
-        app:showAsAction="ifRoom"
-        ></item>
-    <item
-        android:id="@+id/action_user"
-        android:orderInCategory="300"
-        android:title="User"
-        android:icon="@android:drawable/ic_input_add"
-        app:showAsAction="ifRoom"></item>
+        android:id="@+id/action_back_to_notes_from_starred"
+        android:orderInCategory="100"
+        android:title="@string/backToNotes"
+        app:showAsAction="never" />
 
+    <item
+        android:id="@+id/action_add_note_starred"
+        android:icon="@android:drawable/ic_input_add"
+        android:title="@string/Add_Note"
+        app:showAsAction="always"/>
 </menu>

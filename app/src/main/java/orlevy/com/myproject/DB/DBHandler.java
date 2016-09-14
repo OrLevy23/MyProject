@@ -54,6 +54,7 @@ public class DBHandler {
             }
         }
 
+
     }
     public void archiveAll() {
         SQLiteDatabase db = helper.getWritableDatabase(); // helper is object extends SQLiteOpenHelper
@@ -98,8 +99,8 @@ public class DBHandler {
         ArrayList<Note> list = new ArrayList<>();
         SQLiteDatabase db = helper.getReadableDatabase();
         Cursor cursor = null;
-        Boolean isStarred = false;
-        Boolean isArchived = false;
+        Boolean isStarred;
+        Boolean isArchived;
         try {
             cursor = db.query(CONSTANTS.DB_TABLE_NAME,null,CONSTANTS.DB_ARCHIVED+"=0",null,null,null,null);
 //            cursor = db.query(CONSTANTS.DB_TABLE_NAME, null, null, null, null, null, null, null);
@@ -115,7 +116,6 @@ public class DBHandler {
             e.getMessage();
         }
         return list;
-
     }
 
     public void editNote(int idToEdit, String strSubject, String strNote, boolean isStarred,boolean isArchived) {

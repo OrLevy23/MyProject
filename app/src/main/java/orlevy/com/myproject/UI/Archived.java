@@ -4,15 +4,17 @@ import android.app.AlertDialog;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
+import android.support.design.widget.Snackbar;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.view.Menu;
 import android.view.MenuItem;
-import android.widget.ImageView;
+import android.view.View;
 
 import java.util.ArrayList;
 
+import orlevy.com.myproject.Adapter.MyAdapter;
 import orlevy.com.myproject.Class.Note;
 import orlevy.com.myproject.DB.DBHandler;
 import orlevy.com.myproject.R;
@@ -22,7 +24,7 @@ public class Archived extends AppCompatActivity {
     private RecyclerView recyclerView;
     private MyAdapter adapter;
     private DBHandler handler;
-    private ImageView imageView;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -45,15 +47,15 @@ public class Archived extends AppCompatActivity {
             }
 
             @Override
-            public void onSecondaryIconClick(int p) {
+            public void onSecondaryIconClick(final int p) {
                 final AlertDialog.Builder builder = new AlertDialog.Builder(Archived.this);
                 builder.setTitle("Are you sure?");
                 builder.setMessage("Note will be deleted");
                 builder.setPositiveButton("OK", new DialogInterface.OnClickListener() {
                     @Override
                     public void onClick(DialogInterface dialog, int which) {
-                        handler.removeAll();
-                        adapter.clearData();
+                        handler.deleteRecord(list.get(p).getId());
+                        adapter.deleteItem(p);
                     }
                 });
                 builder.setNegativeButton("Cancel", null);
@@ -87,6 +89,9 @@ public class Archived extends AppCompatActivity {
                 public void onClick(DialogInterface dialog, int which) {
                     handler.removeAll();
                     adapter.clearData();
+                    View view = findViewById(android.R.id.content);
+                    Snackbar.make(view, "all items were deleted", Snackbar.LENGTH_LONG)
+                            .setAction("Action", null).show();
                 }
             });
             builder.setNegativeButton("Cancel", null);

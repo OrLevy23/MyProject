@@ -9,5 +9,8 @@
     <string name="archived">Archived notes</string>
     <string name="back">back</string>
     <string name="Delete_all">Delete all</string>
+    <string name="backToNotes">Back to notes</string>
+    <string name="title_activity_main2_activitya">Main2Activitya</string>
+    <string name="title_activity_main2">Main2Activity</string>
 
 </resources>

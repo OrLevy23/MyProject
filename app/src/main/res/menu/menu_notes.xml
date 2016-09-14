@@ -15,9 +15,5 @@
         android:title="@string/archived"
         app:showAsAction="never" />
 
-    <item
-        android:id="@+id/action_add_note"
-        android:icon="@android:drawable/ic_input_add"
-        android:title="@string/Add_Note"
-        app:showAsAction="always"/>
+
 </menu>

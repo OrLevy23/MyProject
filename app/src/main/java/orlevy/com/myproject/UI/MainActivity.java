@@ -4,16 +4,19 @@ import android.app.AlertDialog;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
+import android.support.design.widget.FloatingActionButton;
+import android.support.design.widget.Snackbar;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
 import android.view.Menu;
 import android.view.MenuItem;
-import android.widget.Toast;
+import android.view.View;
 
 import java.util.ArrayList;
 
+import orlevy.com.myproject.Adapter.MyAdapter;
 import orlevy.com.myproject.Class.Note;
 import orlevy.com.myproject.DB.DBHandler;
 import orlevy.com.myproject.R;
@@ -23,10 +26,6 @@ public class MainActivity extends AppCompatActivity {
     private RecyclerView recyclerView;
     private MyAdapter adapter;
     private DBHandler handler;
-    private boolean isStarredList = false;
-    private boolean isArchivedList = false;
-    private MenuItem starred;
-    private MenuItem archived;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -41,6 +40,15 @@ public class MainActivity extends AppCompatActivity {
         recyclerView = (RecyclerView) findViewById(R.id.my_recycler_view);
         recyclerView.setLayoutManager(new LinearLayoutManager(this));
         recyclerView.setAdapter(adapter);
+        //Add button
+        FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.fab);
+        fab.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent add = new Intent(MainActivity.this, AddNote.class);
+                startActivity(add);
+            }
+        });
         // Edit
         adapter.setItemClickCallback(new MyAdapter.ItemClickCallback() {
             @Override
@@ -56,7 +64,9 @@ public class MainActivity extends AppCompatActivity {
                 Note note = list.get(p);
                 handler.archiveRecord(note);
                 adapter.archiveItem(p);
-                Toast.makeText(MainActivity.this, "item was archived", Toast.LENGTH_SHORT).show();
+                View view = findViewById(android.R.id.content);
+                Snackbar.make(view, "Item was archived", Snackbar.LENGTH_LONG)
+                        .setAction("Action", null).show();
             }
 
             @Override
@@ -76,8 +86,6 @@ public class MainActivity extends AppCompatActivity {
     public boolean onCreateOptionsMenu(Menu menu) {
         // Inflate the menu; this adds items to the action bar if it is present.
         getMenuInflater().inflate(R.menu.menu_notes, menu);
-        starred= menu.findItem(R.id.action_starred);
-        archived = menu.findItem(R.id.action_archived);
         return true;
     }
 
@@ -105,9 +113,7 @@ public class MainActivity extends AppCompatActivity {
             });
             builder.setNegativeButton("Cancel", null);
             builder.show();
-        } else if(id == R.id.action_add_note) {
-            Intent add = new Intent(MainActivity.this, AddNote.class);
-            startActivity(add);
+
         } else if(id == R.id.action_starred){
                 Intent starred = new Intent(MainActivity.this,Starred.class);
                 startActivity(starred);

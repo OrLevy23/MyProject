@@ -1,4 +1,4 @@
-package orlevy.com.myproject.UI;
+package orlevy.com.myproject.Adapter;
 
 import android.content.Context;
 import android.support.v7.widget.RecyclerView;
@@ -9,6 +9,7 @@ import android.widget.ImageView;
 import android.widget.TextView;
 
 import java.util.ArrayList;
+import java.util.Collections;
 
 import orlevy.com.myproject.Class.Note;
 import orlevy.com.myproject.R;
@@ -16,7 +17,7 @@ import orlevy.com.myproject.R;
 /**
  * Created by Or.levy on 05/09/2016.
  */
-public class MyAdapter extends RecyclerView.Adapter<MyAdapter.MyHolder> {
+public class MyAdapter extends RecyclerView.Adapter<MyAdapter.MyHolder>  implements ItemTouchHelperAdapter {
     private ArrayList<Note> listData;
     private LayoutInflater inflater;
     private ItemClickCallback itemClickCallback;
@@ -36,12 +37,34 @@ public class MyAdapter extends RecyclerView.Adapter<MyAdapter.MyHolder> {
         this.notifyDataSetChanged();
     }
 
+    @Override
+    public void onItemDismiss(int position) {
+        listData.remove(position);
+        notifyItemRemoved(position);
+    }
+    public void onItemMove(int fromPosition, int toPosition) {
+        if (fromPosition < toPosition) {
+            for (int i = fromPosition; i < toPosition; i++) {
+                Collections.swap(listData, i, i + 1);
+            }
+        } else {
+            for (int i = fromPosition; i > toPosition; i--) {
+                Collections.swap(listData, i, i - 1);
+            }
+        }
+        notifyItemMoved(fromPosition, toPosition);
+    }
+
+
+
+
     public interface ItemClickCallback {
         void onItemClick(int p);
 
         void onSecondaryIconClick(int p);
 
         void onStarredIconClick(int p);
+
     }
 
     public void setItemClickCallback(final ItemClickCallback itemClickCallback) {
@@ -64,12 +87,20 @@ public class MyAdapter extends RecyclerView.Adapter<MyAdapter.MyHolder> {
         this.listData.remove(id);
         this.notifyDataSetChanged();
     }
+    public void deleteItem(int id) {
+        this.listData.remove(id);
+        this.notifyDataSetChanged();
+    }
     public void setStarred(int id) {
         Note temp = this.listData.get(id);
         temp.setStar();
         this.listData.set(id,temp);
         this.notifyDataSetChanged();
 
+    }
+    public void removeStare(int id){
+        this.listData.remove(id);
+        this.notifyDataSetChanged();
     }
 
     @Override
@@ -141,10 +172,7 @@ public class MyAdapter extends RecyclerView.Adapter<MyAdapter.MyHolder> {
         this.listData = archived;
         this.notifyDataSetChanged();
     }
-    public void getAll(){
-        this.listData = backup;
-        this.notifyDataSetChanged();
-    }
+
 
 
 }

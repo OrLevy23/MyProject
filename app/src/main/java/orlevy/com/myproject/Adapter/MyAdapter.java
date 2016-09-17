@@ -58,10 +58,11 @@ public class MyAdapter extends RecyclerView.Adapter<MyAdapter.MyHolder>  impleme
 
 
 
+
+
+
     public interface ItemClickCallback {
         void onItemClick(int p);
-
-        void onSecondaryIconClick(int p);
 
         void onStarredIconClick(int p);
 
@@ -139,11 +140,9 @@ public class MyAdapter extends RecyclerView.Adapter<MyAdapter.MyHolder>  impleme
             super(itemView);
             subject = (TextView) itemView.findViewById(R.id.subject);
             note = (TextView) itemView.findViewById(R.id.note);
-            ImageView icon = (ImageView) itemView.findViewById(R.id.delete_recycler);
             starred = (ImageView)itemView.findViewById(R.id.star_recycler);
             container = itemView.findViewById(R.id.cont_item_root);
             container.setOnClickListener(this);
-            icon.setOnClickListener(this);
             starred.setOnClickListener(this);
         }
 
@@ -153,8 +152,6 @@ public class MyAdapter extends RecyclerView.Adapter<MyAdapter.MyHolder>  impleme
                 itemClickCallback.onItemClick(getAdapterPosition());
             } else if (view.getId() == R.id.star_recycler) {
                 itemClickCallback.onStarredIconClick(getAdapterPosition());
-            } else if (view.getId() == R.id.delete_recycler ){
-                itemClickCallback.onSecondaryIconClick(getAdapterPosition());
             }
         }
     }
@@ -172,6 +169,7 @@ public class MyAdapter extends RecyclerView.Adapter<MyAdapter.MyHolder>  impleme
         this.listData = archived;
         this.notifyDataSetChanged();
     }
+
 
 
 

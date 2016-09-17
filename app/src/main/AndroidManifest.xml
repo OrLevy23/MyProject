@@ -30,7 +30,8 @@
             android:theme="@style/AppTheme" />
         <activity
             android:name=".UI.Starred"
-            android:theme="@style/AppTheme" />
+            android:theme="@style/AppTheme"
+            android:parentActivityName=".UI.MainActivity"/>
     </application>
 
 </manifest>

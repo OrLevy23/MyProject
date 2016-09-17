@@ -7,7 +7,6 @@ import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.view.Menu;
 import android.view.MenuItem;
-import android.widget.Toast;
 
 import java.util.ArrayList;
 
@@ -37,17 +36,11 @@ public class Starred extends AppCompatActivity {
             @Override
             public void onItemClick(int p) {
                 Intent edit = new Intent(Starred.this,AddNote.class);
+                edit.putExtra("id",list.get(p).getId());
+                edit.putExtra("fromStarred",true);
                 startActivity(edit);
             }
 
-            @Override
-            public void onSecondaryIconClick(int p) {
-                Note note = list.get(p);
-                handler.archiveRecord(note);
-                adapter.archiveItem(p);
-                Toast.makeText(Starred.this, "item was archived", Toast.LENGTH_SHORT).show();
-
-            }
 
             @Override
             public void onStarredIconClick(int p) {
@@ -74,7 +67,7 @@ public class Starred extends AppCompatActivity {
             startActivity(back);
         } else if(id == R.id.action_add_note_starred) {
             Intent addStarredNote = new Intent(Starred.this,AddNote.class);
-            addStarredNote.putExtra("starred", true);
+            addStarredNote.putExtra("fromStarred", true);
             startActivity(addStarredNote);
         } else if(id == R.id.action_archive_all_starred){
 

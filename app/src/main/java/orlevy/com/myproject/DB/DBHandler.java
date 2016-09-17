@@ -42,10 +42,12 @@ public class DBHandler {
 
 
 
-    public void removeAll() {
+    public void archiveAll() {
         SQLiteDatabase db = helper.getWritableDatabase(); // helper is object extends SQLiteOpenHelper
+        ContentValues archived = new ContentValues();
+        archived.put(CONSTANTS.DB_ARCHIVED,1);
         try {
-            db.delete(CONSTANTS.DB_TABLE_NAME, CONSTANTS.DB_ARCHIVED+"=1", null);
+            db.update(CONSTANTS.DB_TABLE_NAME,archived,null,null);
         } catch (SQLiteException e) {
             e.getMessage();
         } finally {
@@ -56,11 +58,10 @@ public class DBHandler {
 
 
     }
-    public void archiveAll() {
+    public void deleteAll() {
         SQLiteDatabase db = helper.getWritableDatabase(); // helper is object extends SQLiteOpenHelper
         try {
-
-//            db.update(CONSTANTS.DB_TABLE_NAME, CONSTANTS.DB_ARCHIVED+"=1", null);
+            db.delete(CONSTANTS.DB_TABLE_NAME,null,null);
         } catch (SQLiteException e) {
             e.getMessage();
         } finally {
@@ -147,15 +148,12 @@ public class DBHandler {
             }
         }
     }
-    public void archiveRecord(Note note) {
+    public void archiveRecord(int id) {
         SQLiteDatabase db = helper.getWritableDatabase();
         try {
             ContentValues archived = new ContentValues();
-            archived.put(CONSTANTS.DB_SUBJECT, note.getSubject());
-            archived.put(CONSTANTS.DB_NOTE, note.getNote());
-            archived.put(CONSTANTS.DB_STARRED, 0); // if note was archived - star will automatically remove
             archived.put(CONSTANTS.DB_ARCHIVED,1);
-            db.update(CONSTANTS.DB_TABLE_NAME,archived,CONSTANTS.DB_ID + "=?",new String[]{Integer.toString(note.getId())});
+            db.update(CONSTANTS.DB_TABLE_NAME,archived,CONSTANTS.DB_ID + "=?",new String[]{Integer.toString(id)});
         } catch (SQLiteException e) {
             e.getMessage();
         } finally {

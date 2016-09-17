@@ -5,18 +5,20 @@ import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.design.widget.FloatingActionButton;
-import android.support.design.widget.Snackbar;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
+import android.support.v7.widget.helper.ItemTouchHelper;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
-
+import android.widget.ImageView;
 import java.util.ArrayList;
+import java.util.Collections;
 
 import orlevy.com.myproject.Adapter.MyAdapter;
+import orlevy.com.myproject.Adapter.SimpleItemTouchHelperCallback;
 import orlevy.com.myproject.Class.Note;
 import orlevy.com.myproject.DB.DBHandler;
 import orlevy.com.myproject.R;
@@ -26,22 +28,55 @@ public class MainActivity extends AppCompatActivity {
     private RecyclerView recyclerView;
     private MyAdapter adapter;
     private DBHandler handler;
+    private static ImageView emptyNotebook;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
-         // DB
+        final FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.fab);
+        emptyNotebook = (ImageView) findViewById(R.id.empty_notebook);
+        // DB
         handler = new DBHandler(MainActivity.this);
         list = handler.getAllNotes();
+        checkIfEmpty();
         // RecView
-        adapter = new MyAdapter(list, MainActivity.this);
+        adapter = new MyAdapter(list, MainActivity.this) {
+            @Override
+            public void onItemDismiss(int position) {
+                handler.archiveRecord(list.get(position).getId());
+                adapter.archiveItem(position);
+                notifyItemRemoved(position);
+                checkIfEmpty();
+
+            }
+
+            public void onItemMove(int fromPosition, int toPosition) {
+                if (fromPosition < toPosition) {
+                    for (int i = fromPosition; i < toPosition; i++) {
+                        Collections.swap(list, i, i + 1);
+                    }
+                } else {
+                    for (int i = fromPosition; i > toPosition; i--) {
+                        Collections.swap(list, i, i - 1);
+                    }
+                }
+                notifyItemMoved(fromPosition, toPosition);
+            }
+
+        };
+
+
         recyclerView = (RecyclerView) findViewById(R.id.my_recycler_view);
         recyclerView.setLayoutManager(new LinearLayoutManager(this));
         recyclerView.setAdapter(adapter);
+        ItemTouchHelper.Callback callback = new SimpleItemTouchHelperCallback(adapter);
+        ItemTouchHelper touchHelper = new ItemTouchHelper(callback);
+        touchHelper.attachToRecyclerView(recyclerView);
+
         //Add button
-        FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.fab);
         fab.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -57,18 +92,6 @@ public class MainActivity extends AppCompatActivity {
                 edit.putExtra("id",list.get(p).getId());
                 startActivity(edit);
             }
-
-            //Delete
-            @Override
-            public void onSecondaryIconClick(final int p) {
-                Note note = list.get(p);
-                handler.archiveRecord(note);
-                adapter.archiveItem(p);
-                View view = findViewById(android.R.id.content);
-                Snackbar.make(view, "Item was archived", Snackbar.LENGTH_LONG)
-                        .setAction("Action", null).show();
-            }
-
             @Override
             public void onStarredIconClick(int p) {
                 Note noteToStar = list.get(p);
@@ -79,6 +102,14 @@ public class MainActivity extends AppCompatActivity {
 
         });
 
+    }
+
+    private void checkIfEmpty() {
+        if(!list.isEmpty()) {
+            emptyNotebook.setVisibility(View.GONE);
+        } else {
+            emptyNotebook.setVisibility(View.VISIBLE);
+        }
     }
 
 
@@ -104,11 +135,12 @@ public class MainActivity extends AppCompatActivity {
             builder.setPositiveButton("OK", new DialogInterface.OnClickListener() {
                 @Override
                 public void onClick(DialogInterface dialog, int which) {
-                    handler.removeAll();
+                    handler.archiveAll();
                     list.clear();
                     list = handler.getAllNotes();
                     adapter.clearData();
                     adapter.notifyDataSetChanged();
+                    checkIfEmpty();
                 }
             });
             builder.setNegativeButton("Cancel", null);

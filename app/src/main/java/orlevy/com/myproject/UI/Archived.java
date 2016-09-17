@@ -8,13 +8,16 @@ import android.support.design.widget.Snackbar;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.support.v7.widget.helper.ItemTouchHelper;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 
 import java.util.ArrayList;
+import java.util.Collections;
 
 import orlevy.com.myproject.Adapter.MyAdapter;
+import orlevy.com.myproject.Adapter.SimpleItemTouchHelperCallback;
 import orlevy.com.myproject.Class.Note;
 import orlevy.com.myproject.DB.DBHandler;
 import orlevy.com.myproject.R;
@@ -32,35 +35,57 @@ public class Archived extends AppCompatActivity {
         // DB
         handler = new DBHandler(Archived.this);
         list = handler.getArchived();
+        adapter = new MyAdapter(list, Archived.this) {
+            @Override
+            public void onItemDismiss(final int position) {
+                final AlertDialog.Builder builder = new AlertDialog.Builder(Archived.this);
+                builder.setTitle("Delete");
+                builder.setMessage("Note will be deleted, are you sure?");
+                builder.setPositiveButton("Yes", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        handler.deleteRecord(list.get(position).getId());
+                        adapter.deleteItem(position);
+                        notifyItemRemoved(position);
+                    }
+                });
+                builder.setNegativeButton("No", null);
+                builder.show();
+//                checkIfEmpty();
+
+            }
+
+            public void onItemMove(int fromPosition, int toPosition) {
+                if (fromPosition < toPosition) {
+                    for (int i = fromPosition; i < toPosition; i++) {
+                        Collections.swap(list, i, i + 1);
+                    }
+                } else {
+                    for (int i = fromPosition; i > toPosition; i--) {
+                        Collections.swap(list, i, i - 1);
+                    }
+                }
+                notifyItemMoved(fromPosition, toPosition);
+            }
+
+        };
+
         // RecView
-        adapter = new MyAdapter(list, Archived.this);
         recyclerView = (RecyclerView) findViewById(R.id.rec_view_archived);
         recyclerView.setLayoutManager(new LinearLayoutManager(this));
         recyclerView.setAdapter(adapter);
-        adapter.setItemClickCallback(new MyAdapter.ItemClickCallback() {
+        ItemTouchHelper.Callback callback = new SimpleItemTouchHelperCallback(adapter);
+        ItemTouchHelper touchHelper = new ItemTouchHelper(callback);
+        touchHelper.attachToRecyclerView(recyclerView);
+         adapter.setItemClickCallback(new MyAdapter.ItemClickCallback() {
             @Override
             public void onItemClick(int p) {
                 Intent edit = new Intent(Archived.this, AddNote.class);
                 edit.putExtra("id",list.get(p).getId());
-                edit.putExtra("archived",true);
+                edit.putExtra("fromArchived",true);
                 startActivity(edit);
             }
 
-            @Override
-            public void onSecondaryIconClick(final int p) {
-                final AlertDialog.Builder builder = new AlertDialog.Builder(Archived.this);
-                builder.setTitle("Are you sure?");
-                builder.setMessage("Note will be deleted");
-                builder.setPositiveButton("OK", new DialogInterface.OnClickListener() {
-                    @Override
-                    public void onClick(DialogInterface dialog, int which) {
-                        handler.deleteRecord(list.get(p).getId());
-                        adapter.deleteItem(p);
-                    }
-                });
-                builder.setNegativeButton("Cancel", null);
-                builder.show();
-            }
 
             @Override
             public void onStarredIconClick(int p) {
@@ -79,7 +104,8 @@ public class Archived extends AppCompatActivity {
     public boolean onOptionsItemSelected(MenuItem item) {
         int id = item.getItemId();
         if(id == R.id.action_back) {
-            finish();
+            Intent backMain = new Intent(Archived.this,MainActivity.class);
+            startActivity(backMain);
         } else if(id == R.id.action_delete_all) {
             final AlertDialog.Builder builder = new AlertDialog.Builder(Archived.this);
             builder.setTitle("Are you sure?");
@@ -87,7 +113,7 @@ public class Archived extends AppCompatActivity {
             builder.setPositiveButton("OK", new DialogInterface.OnClickListener() {
                 @Override
                 public void onClick(DialogInterface dialog, int which) {
-                    handler.removeAll();
+                    handler.deleteAll();
                     adapter.clearData();
                     View view = findViewById(android.R.id.content);
                     Snackbar.make(view, "all items were deleted", Snackbar.LENGTH_LONG)

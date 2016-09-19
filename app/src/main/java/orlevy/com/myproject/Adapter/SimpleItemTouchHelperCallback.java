@@ -6,6 +6,7 @@ import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Paint;
 import android.graphics.RectF;
+import android.support.v4.view.ViewCompat;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.helper.ItemTouchHelper;
 import android.view.View;
@@ -17,8 +18,10 @@ import orlevy.com.myproject.R;
  */
 
 public class SimpleItemTouchHelperCallback extends ItemTouchHelper.Callback {
-
+    private boolean viewBeingCleared= false;
     private final ItemTouchHelperAdapter mAdapter;
+    private static Bitmap icon;
+    private Canvas canvas;
 
 
     public SimpleItemTouchHelperCallback(ItemTouchHelperAdapter adapter) {
@@ -66,30 +69,41 @@ public class SimpleItemTouchHelperCallback extends ItemTouchHelper.Callback {
             float width = height / 3;
 
             Paint p = new Paint();
-            if (dX > 0) {
-                p.setColor(Color.parseColor("#D32F2F"));
-                // Draw Rect with varying right side, equal to displacement dX
-                RectF background  = new RectF((float) itemView.getLeft(), (float) itemView.getTop(), dX,(float) itemView.getBottom());
-                c.drawRect(background,p);
-                Bitmap icon = BitmapFactory.decodeResource(itemView.getContext().getResources(), R.drawable.ic_delete_sweep_white_48dp);
-//                RectF icon_dest = new RectF((float) itemView.getLeft() + 2*width ,(float) itemView.getTop() + width,(float) itemView.getLeft() - width,(float)itemView.getBottom() - width);
-                RectF icon_dest = new RectF((float) itemView.getLeft() - 2*width ,(float) itemView.getTop() - width,(float) itemView.getLeft() - width,(float)itemView.getBottom() - width);
-                c.drawBitmap(icon,null,icon_dest,p);
+                if (dX > 0) {
+                    p.setColor(Color.parseColor("#D32F2F"));
+                    // Draw Rect with varying right side, equal to displacement dX
+                    RectF background = new RectF((float) itemView.getLeft(), (float) itemView.getTop(), dX, (float) itemView.getBottom());
+                    c.drawRect(background, p);
+                    Bitmap icon = BitmapFactory.decodeResource(itemView.getContext().getResources(), R.drawable.ic_delete_sweep_white_48dp);
+                RectF icon_dest = new RectF((float) itemView.getLeft() + 2*width ,(float) itemView.getTop() + width,(float) itemView.getLeft() - width,(float)itemView.getBottom() - width);
+//                    RectF icon_dest = new RectF((float) itemView.getLeft() - 2 * width, (float) itemView.getTop() - width, (float) itemView.getLeft() - width, (float) itemView.getBottom() - width);
+                    c.drawBitmap(icon, null, icon_dest, p);
 
 
-            } else {
+                } else {
 //                Bitmap icon = BitmapFactory.decodeResource(itemView.getContext().getResources(), R.drawable.ic_delete);
-                // Draw Rect with varying left side, equal to the item's right side plus negative displacement dX
-                p.setColor(Color.parseColor("#D32F2F"));
-                RectF background = new RectF((float) itemView.getRight() + dX, (float) itemView.getTop(),(float) itemView.getRight(), (float) itemView.getBottom());
-                c.drawRect(background,p);
-                Bitmap icon = BitmapFactory.decodeResource(itemView.getContext().getResources(), R.drawable.ic_delete_sweep_white_48dp);
-                RectF icon_dest = new RectF((float) itemView.getRight() - 2*width ,(float) itemView.getTop() + width,(float) itemView.getRight() - width,(float)itemView.getBottom() - width);
-                c.drawBitmap(icon,null,icon_dest,p);
+                    // Draw Rect with varying left side, equal to the item's right side plus negative displacement dX
+                    p.setColor(Color.parseColor("#D32F2F"));
+                    RectF background = new RectF((float) itemView.getRight() + dX, (float) itemView.getTop(), (float) itemView.getRight(), (float) itemView.getBottom());
+                    c.drawRect(background, p);
+//                    icon = BitmapFactory.decodeResource(itemView.getContext().getResources(), R.drawable.ic_delete);
+                    RectF icon_dest = new RectF((float) itemView.getRight() - 2 * width, (float) itemView.getTop() + width, (float) itemView.getRight() - width, (float) itemView.getBottom() - width);
+//                    c.drawBitmap(icon, null, icon_dest, p);
+                    canvas =c;
+                }
+                super.onChildDraw(c, recyclerView, viewHolder, dX, dY, actionState, isCurrentlyActive);
+            if (viewBeingCleared) {
+                viewBeingCleared = false;
+            } else {
+//                ViewCompat.setElevation(viewHolder.itemView, itemView.getContext().getResources().getDimension(R.dimen.common_elevation));
             }
-
-            super.onChildDraw(c, recyclerView, viewHolder, dX, dY, actionState, isCurrentlyActive);
         }
+    }
+
+    @Override
+    public void clearView(RecyclerView recyclerView, RecyclerView.ViewHolder viewHolder) {
+        super.clearView(recyclerView, viewHolder);
+        ViewCompat.setElevation(viewHolder.itemView, 0);
     }
 
 }

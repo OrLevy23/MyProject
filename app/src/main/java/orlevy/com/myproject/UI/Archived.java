@@ -49,7 +49,13 @@ public class Archived extends AppCompatActivity {
                         notifyItemRemoved(position);
                     }
                 });
-                builder.setNegativeButton("No", null);
+                builder.setNegativeButton("No", new DialogInterface.OnClickListener() {
+
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        adapter.notifyDataSetChanged();
+                    }
+                });
                 builder.show();
 //                checkIfEmpty();
 

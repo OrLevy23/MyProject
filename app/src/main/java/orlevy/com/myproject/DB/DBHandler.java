@@ -16,18 +16,18 @@ public class DBHandler {
     private DBHelper helper;
 
     public DBHandler(Context context) {
-        helper = new DBHelper(context, "Note.db", null, 2);
+        helper = new DBHelper(context, "Note.db", null, CONSTANTS.DB_VERSION);
     }
 
-    public void addNote(String subject, String note,boolean starred,boolean Archived) {
+    public void addNote(String subject, String note,boolean starred,boolean Archived,int color) {
         SQLiteDatabase db = helper.getWritableDatabase();
         try {
-            //  db.execSQL("Insert into book values('pinokio','jepeto','100')"); NOT recommended
             ContentValues values = new ContentValues();
             values.put(CONSTANTS.DB_SUBJECT, subject);
             values.put(CONSTANTS.DB_NOTE, note);
             values.put(CONSTANTS.DB_STARRED,starToInt(starred));
             values.put(CONSTANTS.DB_ARCHIVED,0);
+            values.put(CONSTANTS.DB_COLOR,color);
             db.insert(CONSTANTS.DB_TABLE_NAME, null, values);
         } catch (SQLiteException e) {
             e.getMessage();
@@ -75,18 +75,21 @@ public class DBHandler {
     public Note getItem(int id) {
         Boolean isStarred = false;
         Boolean isArchived = false;
+        int getID;
         SQLiteDatabase db = helper.getReadableDatabase();
         Cursor cursor = null;
+        int color;
         Note temp = null;
         try {
             cursor = db.query(CONSTANTS.DB_TABLE_NAME,null,CONSTANTS.DB_ID+"=?",new String[]{Integer.toString(id)},null,null,null,null);
             while (cursor.moveToNext()) {
-                int getID = cursor.getInt(0);
+                getID = cursor.getInt(0);
                 String subject = cursor.getString(1);
                 String note = cursor.getString(2);
                 isStarred = intToBool(cursor.getInt(3));
                 isArchived = intToBool(cursor.getInt(4));
-                temp = new Note(getID,subject,note,isStarred,isArchived);
+                color = cursor.getInt(5);
+                temp = new Note(getID,subject,note,isStarred,isArchived,color);
             }
         } catch (SQLiteException e) {
             e.getMessage();
@@ -111,7 +114,8 @@ public class DBHandler {
                 String note = cursor.getString(2);
                 isStarred = intToBool(cursor.getInt(3));
                 isArchived = intToBool(cursor.getInt(4));
-                list.add(new Note(id,subject, note,isStarred,isArchived));
+                int color = cursor.getInt(5);
+                list.add(new Note(id,subject, note,isStarred,isArchived,color));
             }
         } catch (SQLiteException e) {
             e.getMessage();
@@ -119,7 +123,7 @@ public class DBHandler {
         return list;
     }
 
-    public void editNote(int idToEdit, String strSubject, String strNote, boolean isStarred,boolean isArchived) {
+    public void editNote(int idToEdit, String strSubject, String strNote, boolean isStarred,boolean isArchived,int color) {
         SQLiteDatabase db = helper.getWritableDatabase();
         try {
             ContentValues args = new ContentValues();
@@ -127,6 +131,7 @@ public class DBHandler {
             args.put(CONSTANTS.DB_NOTE, strNote);
             args.put(CONSTANTS.DB_STARRED, starToInt(isStarred));
             args.put(CONSTANTS.DB_ARCHIVED,isArchived);
+            args.put(CONSTANTS.DB_COLOR, color);
             db.update("Note", args, "_id" + "=" + idToEdit, null);
         } catch (SQLiteException e) {
             e.getMessage();
@@ -174,7 +179,8 @@ public class DBHandler {
                 String note = cursor.getString(2);
                 Boolean isStarred = intToBool(cursor.getInt(3));
                 Boolean isArchived = intToBool(cursor.getInt(4));
-                list.add(new Note(id, subject, note, isStarred,isArchived));
+                int color = cursor.getInt(5);
+                list.add(new Note(id, subject, note, isStarred,isArchived,color));
             }
         } catch (SQLiteException e) {
             e.getMessage();
@@ -192,7 +198,8 @@ public class DBHandler {
                 String note = cursor.getString(2);
                 Boolean isStarred = intToBool(cursor.getInt(3));
                 Boolean isArchived = intToBool(cursor.getInt(4));
-                list.add(new Note(id, subject, note, isStarred,isArchived));
+                int color = cursor.getInt(5);
+                list.add(new Note(id, subject, note, isStarred,isArchived,color));
             }
         } catch (SQLiteException e) {
             e.getMessage();
@@ -219,8 +226,6 @@ public class DBHandler {
         SQLiteDatabase db = helper.getWritableDatabase();
         try {
             ContentValues args = new ContentValues();
-            args.put(CONSTANTS.DB_SUBJECT, note.getSubject());
-            args.put(CONSTANTS.DB_NOTE, note.getNote());
             args.put(CONSTANTS.DB_STARRED, starToInt(!(note.isStarred())));
             db.update("Note", args, "_id" + "=" + id, null);
         } catch (SQLiteException e) {

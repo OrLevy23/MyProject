@@ -5,6 +5,7 @@ import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.design.widget.FloatingActionButton;
+import android.support.design.widget.Snackbar;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
@@ -14,6 +15,7 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.ImageView;
+
 import java.util.ArrayList;
 import java.util.Collections;
 
@@ -22,6 +24,7 @@ import orlevy.com.myproject.Adapter.SimpleItemTouchHelperCallback;
 import orlevy.com.myproject.Class.Note;
 import orlevy.com.myproject.DB.DBHandler;
 import orlevy.com.myproject.R;
+
 
 public class MainActivity extends AppCompatActivity {
     private static ArrayList<Note> list = new ArrayList<>();
@@ -49,6 +52,9 @@ public class MainActivity extends AppCompatActivity {
                 handler.archiveRecord(list.get(position).getId());
                 adapter.archiveItem(position);
                 notifyItemRemoved(position);
+                Snackbar.make(findViewById(R.id.Coordinator), "Item was archived", Snackbar.LENGTH_LONG)
+                        .setAction("Action", null).show();
+
                 checkIfEmpty();
 
             }
@@ -155,13 +161,6 @@ public class MainActivity extends AppCompatActivity {
         }
 
         return true;
-    }
-
-
-    @Override
-    protected void onResume() {
-        super.onResume();
-        adapter.notifyDataSetChanged();
     }
 
 

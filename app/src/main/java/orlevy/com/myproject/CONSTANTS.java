@@ -12,6 +12,7 @@ public class CONSTANTS {
     public static final String DB_NOTE = "note";
     public static final String DB_STARRED = "starred";
     public static final String DB_ARCHIVED = "archived";
+    public static final String DB_COLOR = "color";
     public static final int DB_VERSION = 1;
     public static final String MENU_STAR_LIST = "Starred list";
     public static final String MENU_BACK_TO_NOTES = "Back to notes";

@@ -1,7 +1,5 @@
 package orlevy.com.myproject.Class;
 
-import android.graphics.Color;
-
 import java.util.Date;
 
 /**
@@ -12,10 +10,19 @@ public class Note {
     private String subject;
     private String note;
     private boolean star=false;
-    private Color color;
+    private int color;
     private Date date;
     private int id;
     private boolean archived = false;
+
+    public Note(int getID, String subject, String note, Boolean isStarred, Boolean isArchived, int color) {
+        this.id = getID;
+        this.subject = subject;
+        this.note = note;
+        this.star = isStarred;
+        this.color = color;
+        this.archived = isArchived;
+    }
 
     public String getSubject() {
         return subject;
@@ -33,11 +40,11 @@ public class Note {
         this.note = note;
     }
 
-    public Color getColor() {
+    public int getColor() {
         return color;
     }
 
-    public void setColor(Color color) {
+    public void setColor(int color) {
         this.color = color;
     }
 
@@ -61,6 +68,7 @@ public class Note {
         this.archived = archived;
     }
 
+
     public boolean isStarred() {
         return star;
     }
@@ -75,6 +83,7 @@ public class Note {
         }
         return false;
     }
+
 
     public boolean isArchived() {
         return archived;

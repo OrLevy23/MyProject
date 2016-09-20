@@ -22,6 +22,7 @@ public class MyAdapter extends RecyclerView.Adapter<MyAdapter.MyHolder>  impleme
     private LayoutInflater inflater;
     private ItemClickCallback itemClickCallback;
     private static ImageView starred;
+    private static ImageView color;
     private static ArrayList<Note> archived = new ArrayList<>();
     private static ArrayList<Note> backup = new ArrayList<>();
 
@@ -115,11 +116,13 @@ public class MyAdapter extends RecyclerView.Adapter<MyAdapter.MyHolder>  impleme
         Note note = listData.get(position);
         holder.subject.setText(note.getSubject());
         holder.note.setText(note.getNote());
+        color.setBackgroundColor(note.getColor());
         if(note.isStarred()) {
             starred.setImageResource(R.drawable.starred);
         } else {
             starred.setImageResource(R.drawable.not_starred);
         }
+
 //        holder.icon.setImageResource(item.getImageResId());
 
     }
@@ -141,6 +144,7 @@ public class MyAdapter extends RecyclerView.Adapter<MyAdapter.MyHolder>  impleme
             subject = (TextView) itemView.findViewById(R.id.subject);
             note = (TextView) itemView.findViewById(R.id.note);
             starred = (ImageView)itemView.findViewById(R.id.star_recycler);
+            color = (ImageView) itemView.findViewById(R.id.color);
             container = itemView.findViewById(R.id.cont_item_root);
             container.setOnClickListener(this);
             starred.setOnClickListener(this);
@@ -169,8 +173,6 @@ public class MyAdapter extends RecyclerView.Adapter<MyAdapter.MyHolder>  impleme
         this.listData = archived;
         this.notifyDataSetChanged();
     }
-
-
 
 
 }
